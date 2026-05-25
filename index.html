@@ -1,16 +1,16 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="theme-color" content="#000010" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Player Radio</title>
-<meta name="description" content="Player Radio" />
+<title>Player para Radio</title>
+<meta name="description" content="Player para Radio" />
 <meta property="og:type" content="website" />
-<meta property="og:site_name" content="Player Radio" />
+<meta property="og:site_name" content="Player para Radio" />
 <meta property="og:url" content="tu url" />
-<meta property="og:title" content="Player Radio" />
-<meta property="og:description" content="Player Radio" />
+<meta property="og:title" content="Player para Radio" />
+<meta property="og:description" content="Player para Radio" />
 <meta property="og:image" content="img/og-image.jpg" />
 <meta property="og:image:type" content="image/jpeg" />
 <meta property="og:image:width" content="600" />
@@ -23,13 +23,13 @@
 
 <script>
 // URL del stream de tu radio
-  const stream = "https://stream.zeno.fm/l769oej8epkvv.aac";
+const stream = "https://servistream.info:8320/stream";
 
-// OPCION1: API LOCAL (COMPATIBLE CON SHOUTCAST, ICECAST, ZENO RADIO Y OTROS)
-//  const metadata = "api.php?url=" + encodeURIComponent(stream);
+// OPCION1: API LOCAL (COMPATIBLE CON ICECAST, SHOUTCAST, ZENO RADIO Y OTROS)
+const metadata = "api.php?url=" + encodeURIComponent(stream);
 
 //OPCION 2: API EXTERNO la consulta debe tener "title" en su respuesta. Ejemplo: Zeno Radio
-  const metadata = "https://zenoplay.zenomedia.com/api/zenofm/nowplaying/l769oej8epkvv";
+//  const metadata = "https://zenoplay.zenomedia.com/api/zenofm/nowplaying/l769oej8epkvv";
 </script>
 </head>
 
@@ -37,7 +37,7 @@
 <body>
 <nav>
 <div class="nav">
-<a href="./"><img src="img/logo.png" alt="Player Radio" /></a>
+<a href="./"><img src="img/logo.png" alt="Player para Radio" /></a>
 <span class="hamburger"><span></span><span></span><span></span><span></span><span></span>
 </div>
 <div class="menu">
@@ -46,7 +46,7 @@
 <a href="https://apps.apple.com/app" target="_blank"><img src="img/apple.svg" alt="Descarga la aplicacion para iPhone" /></a>
 <a href="https://play.google.com/store/apps" target="_blank"><img src="img/google.svg" alt="Descarga la aplicacion para Android" /></a>
 </div>
-<p><b>© Player Radio</b> La mejor radio en vivo</p>
+<p><b>© Player para Zeno Radio</b> La mejor radio en vivo</p>
 <div class="social">
 <ul>
 <li><a href="https://www.facebook.com" target="_blank" rel="nofollow"><img src="img/facebook.svg"></a></li>
@@ -103,7 +103,8 @@
 <footer>
 <div class="price"><a href="#">Publicidad</a></div>
 <div class="app">
-<a href="https://apps.apple.com/app" target="_blank"><img src="img/apple.svg" alt="Descarga la aplicacion para iPhone" /></a>
+<a href="https://apps.apple.com/app" target="_blank"><img src="img/apple.svg"
+alt="Descarga la aplicacion para iPhone" /></a>
 <a href="https://play.google.com/store/apps" target="_blank"><img src="img/google.svg" alt="Descarga la aplicacion para Android" /></a>
 </div>
 <p><b>© Player para Radio</b> La mejor radio en vivo</p>
@@ -111,10 +112,8 @@
 <ul>
 <li><a href="https://www.facebook.com" rel="_blank"><img src="img/facebook.svg"></a>
 </li>
-<li><a href="https://www.youtube.com" target="_blank" rel="nofollow"><img src="img/youtube.svg"></a>
-</li>
-<li><a href="https://www.instagram.com" target="_blank" rel="nofollow"><img
-src="img/instagram.svg"></a></li>
+<li><a href="https://www.youtube.com" target="_blank" rel="nofollow"><img src="img/youtube.svg"></a></li>
+<li><a href="https://www.instagram.com" target="_blank" rel="nofollow"><img src="img/instagram.svg"></a></li>
 <li><a href="https://www.x.com" target="X" rel="_blank"><img src="img/x.svg"></a></li>
 <li><a href="https://wa.me" target="whatsapp" rel="_blank"><img src="img/whatsapp.svg"></a></li>
 </ul>
@@ -129,13 +128,25 @@ src="img/instagram.svg"></a></li>
 
 <script>
 // Reproductor
-window.onload = () => audio.play();
 const audio = new Audio(stream);
+const volumeControl = document.getElementById("volume");
+const savedVolume = localStorage.getItem("radioVolume");
+const initialVolume = savedVolume !== null ? Number(savedVolume) : 90;
+
+if (volumeControl) {
+volumeControl.value = initialVolume;
+audio.volume = initialVolume / 100;
+$("#volume").on("input", function () {
+audio.volume = this.value / 100;
+localStorage.setItem("radioVolume", this.value);
+});
+}
+
+window.onload = () => audio.play();
 const PLAYPAUSE = () => audio.paused ? (audio.load(), audio.play()) : audio.pause();
 audio.onplay = () => $(".loading, .eq, .play").addClass("on");
 audio.onpause = () => $(".loading, .eq, .play").removeClass("on");
 audio.onerror = () => alert("Radio sin seno falta de pago.");
-$("#volume").on("input", function () { audio.volume = this.value / 100; });
 
 
 // Metadata y Cover
@@ -156,10 +167,10 @@ $.getJSON(`https://itunes.apple.com/search?term==${artist.replace(/\W+/g, '+')}&
 coverData => {
 const image = coverData.results[0]?.artworkUrl100.replace("100x100bb", "600x600bb") || "img/default.jpg";
 $(".images").append(`<img src="${image}" class="lazyload" alt="${currentSong}" />`).find(".lazyload").on("lazyloaded", function () {
-    $(".bg img").remove();
-    $(".bg").append(`<img src="${image}" class="lazyload" alt="" />`);
-    $(".images").css({ transition: "all 1s", transform: "translateX(-100%)" });
-    setTimeout(() => $(".images").removeAttr("style").find("img:first-child").remove(), 1500)
+$(".bg img").remove();
+$(".bg").append(`<img src="${image}" class="lazyload" alt="" />`);
+$(".images").css({ transition: "all 1s", transform: "translateX(-100%)" });
+setTimeout(() => $(".images").removeAttr("style").find("img:first-child").remove(), 1500)
 });
 });
 
